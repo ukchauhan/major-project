@@ -1,24 +1,16 @@
-const { number } = require("joi");
-const mongoose = require("mongoose");
+const Listing = require("../models/listing.js");
+const Review = require("../models/review.js");
 
-const Schema = mongoose.Schema;
 
-const reviewSchema = new Schema({
-    
-    comment : {
-         type : String,
-    },
+module.exports.createReview = async (req, res, next) => { //validateReview
+    console.log("Review route hit!");  // Debugging log
+    let listing = await Listing.findById(id).populate("reviews");
+    let newReview = new Review(req.body.review);
 
-    rating: {
-        type: Number,
-        min: 1,
-        max: 5
-    },
+    listing.reviews.push(newReview);
 
-    createdAt:{
-        type:Date,
-        default: Date.now()
-    }
-});
-
-module.exports = mongoose.model("Review",reviewSchema);
+    await newReview.save();
+    await listing.save();
+    console.log("New review saved");
+    res.redirect(`/listings/${listing._id}`);
+}
